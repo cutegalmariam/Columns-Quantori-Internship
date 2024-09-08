@@ -38,14 +38,8 @@ public class Columns extends Applet implements ModelListener {
 	public void start() {
 		view.gr.setColor(Color.black);
 		timer = Executors.newSingleThreadScheduledExecutor();
-		timer.scheduleAtFixedRate(() -> {
-			// If the game is paused, don't update the game state
-			if (!controller.isPaused()) {
-				model.trySlideDown();  // Only move figures if the game isn't paused
-			}
-		}, 1, 1, TimeUnit.SECONDS);
+		timer.scheduleAtFixedRate(model::trySlideDown, 1, 1, TimeUnit.SECONDS);
 	}
-
 
 	@Override
 	public void paint(Graphics g) {
