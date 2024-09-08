@@ -3,7 +3,7 @@ import java.util.List;
 
 public class Model {
 	static final int FigToDropForNextLevel = 33;
-	static final int MaxLevel = 7;
+	static final int MaxLevel = 4;
 	static final int Width = 7;
 	static final int Depth = 15;
 	public int level;
@@ -14,6 +14,8 @@ public class Model {
 	public int[][] newField;
 	public int[][] oldField;
 	public boolean noChanges = true;
+
+	public static int currentSpeed = 1250;
 	
 	List<ModelListener> listeners = new ArrayList<>();
 
@@ -190,10 +192,20 @@ public class Model {
 
 	void decreaseLevel() {
 		changeLevel(-1);
+		currentSpeed += 250;
+		fireLevelChanged();
 	}
 
 	void increaseLevel() {
 		changeLevel(1);
+		currentSpeed -= 250;
+		fireLevelChanged();
+	}
+
+	private void fireLevelChanged() {
+		for (ModelListener modelListener : listeners) {
+			modelListener.levelHasChanged(level);
+		}
 	}
 
 	void removeSimilarNeighboringCells() {
@@ -270,25 +282,6 @@ public class Model {
 		checkIfFieldIsFull();
 	}
 
-//	public void handlePauseEffect() {
-//		// Start a separate thread to handle the blinking effect
-//		Thread pauseThread = new Thread(() -> {
-//			try {
-//				while (controller.isPaused()) {  // As long as the game is paused
-//					// Hide the figure
-//					view.clearFigure(Fig.x, Fig.y);  // Assuming clearFigure hides the figure from the screen
-//					Thread.sleep(500);  // Wait for half a second
-//
-//					// Re-draw the figure
-//					view.drawFigure(Fig);  // Draw the figure again
-//					Thread.sleep(500);  // Wait for half a second
-//				}
-//			} catch (InterruptedException e) {
-//				Thread.currentThread().interrupt();  // Safely handle thread interruption
-//			}
-//		});
-//		pauseThread.start();  // Start the thread
-//	}
 
 
 }

@@ -6,20 +6,19 @@ import java.awt.Event;
 import java.awt.Graphics;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
 public class Columns extends Applet implements ModelListener {
-
-	static final int TimeShift = 250;
-	static final int MinTimeShift = 200;
+	private static ScheduledFuture<?> slideDownTask;
 
 	Model model = new Model();
 	View view = new View();
 	Controller controller;
-	private ScheduledExecutorService timer;
+	private static ScheduledExecutorService timer;
 
 	@Override
 	public void init() {
@@ -38,7 +37,8 @@ public class Columns extends Applet implements ModelListener {
 	public void start() {
 		view.gr.setColor(Color.black);
 		timer = Executors.newSingleThreadScheduledExecutor();
-		timer.scheduleAtFixedRate(model::trySlideDown, 1, 1, TimeUnit.SECONDS);
+//		timer.scheduleAtFixedRate(model::trySlideDown, 1, 1, TimeUnit.SECONDS);
+		scheduleSlideDown(model, model.currentSpeed);
 	}
 
 	@Override
@@ -53,6 +53,7 @@ public class Columns extends Applet implements ModelListener {
 
 	@Override
 	public void stop() {
+		cancelSlideDown();
 		timer.shutdown();
 	}
 
@@ -86,10 +87,24 @@ public class Columns extends Applet implements ModelListener {
 	@Override
 	public void levelHasChanged(int level) {
 		view.showLevel(level);
+		scheduleSlideDown(model, model.currentSpeed);
 	}
 
 	@Override
 	public void gameOver() {
 		// TODO: Implement game over logic
+	}
+
+	static void scheduleSlideDown(Model model, int speed) {
+		if (slideDownTask != null && !slideDownTask.isCancelled()) {
+			slideDownTask.cancel(false);
+		}
+		slideDownTask = timer.scheduleAtFixedRate(model::trySlideDown, 0, speed, TimeUnit.MILLISECONDS);
+	}
+
+	public static void cancelSlideDown() {
+		if (slideDownTask != null && !slideDownTask.isCancelled()) {
+			slideDownTask.cancel(false);
+		}
 	}
 }

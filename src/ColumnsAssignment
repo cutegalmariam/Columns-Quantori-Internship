@@ -3,5 +3,5 @@
 3. (optional) introduce animations
   a. pausing game should show blinking figure
   b. remove neighbors  with some delays
-4. implement increase/decrease level
+4. implement increase/decrease level +
 5. build cross-platform project with LibGDX

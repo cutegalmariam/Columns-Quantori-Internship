@@ -4,6 +4,10 @@ import java.awt.event.KeyEvent;
 public class Controller extends KeyAdapter {
 
     private final Model model;
+    private View view;
+
+    private boolean isPaused = false;
+    private Thread pauseThread;
 
     public Controller(Model model) {
         this.model = model;
@@ -31,21 +35,35 @@ public class Controller extends KeyAdapter {
             case KeyEvent.VK_SPACE:
                 model.dropFigure(model.Fig);
                 break;
-            case KeyEvent.VK_MINUS:
-                if (model.level > 0)
+            case KeyEvent.VK_2:
+                togglePause();
+                break;
+            case KeyEvent.VK_0:
+                if (model.level > 0) {
                     model.decreaseLevel();
+                    view.showLevel(model.level);
+                }
                 model.removedCellsCounter = 0;
-                // Assuming a method to update view is called from the controller
-                // view.showLevel(model.level);
                 break;
-            case KeyEvent.VK_PLUS:
-                if (model.level < Model.MaxLevel)
+            case KeyEvent.VK_1:
+                if (model.level < Model.MaxLevel) {
                     model.increaseLevel();
+                    view.showLevel(model.level);
+                }
                 model.removedCellsCounter = 0;
-                // Assuming a method to update view is called from the controller
-                // view.showLevel(model.level);
                 break;
-            // Add more cases if needed
+
+
         }
+    }
+    private void togglePause() {
+        if (isPaused) {
+            model.setPaused(false);
+            Columns.scheduleSlideDown(model, model.currentSpeed);
+        } else {
+            model.setPaused(true);
+            Columns.cancelSlideDown();
+        }
+        isPaused = !isPaused;
     }
 }
